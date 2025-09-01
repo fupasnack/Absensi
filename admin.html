@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="id" class="no-js">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin • Presensi FUPA</title>
+  <meta name="theme-color" content="#2563EB" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:wght@400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      --blue-600:#2563EB; --blue-400:#60A5FA; --blue-800:#1E40AF; --blue-300:#93C5FD;
+      --text:#0B1220; --card:#0F172A; --divider:#E2E8F0;
+      --ok:#16a34a; --late:#eab308; --abs:#ef4444;
+      --glass: rgba(15,23,42,.72);
+      --shadow: 0 10px 30px rgba(0,0,0,.25);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#fff;background:#0b1022;overflow-x:hidden}
+    .material-symbols-rounded{font-variation-settings:'FILL' 0,'wght' 600,'GRAD' 0,'opsz' 24}
+
+    /* Background animated */
+    .bg-animated{position:fixed;inset:0;z-index:-2}
+    .bg-gradient{
+      position:absolute; inset:0; z-index:-2;
+      background:
+        radial-gradient(1200px 800px at 20% 30%, rgba(147,197,253,.16), transparent 60%),
+        radial-gradient(900px 600px at 80% 70%, rgba(96,165,250,.12), transparent 60%),
+        linear-gradient(135deg, var(--blue-800), var(--blue-600), var(--blue-400));
+      filter:saturate(1.1);
+    }
+    #bg-light{position:absolute;inset:0;z-index:-1;opacity:.5}
+    @media (prefers-reduced-motion: reduce){#bg-light{display:none}}
+
+    /* App bar */
+    .appbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(15,23,42,.6);backdrop-filter:blur(8px);border-bottom:1px solid rgba(226,232,240,.12)}
+    .brand{margin:0;font-size:18px}
+    .server-time{font-variant-numeric:tabular-nums}
+    .icon-btn{background:transparent;border:0;color:#fff;cursor:pointer;padding:6px;border-radius:10px}
+    .icon-btn.badge{position:relative}
+    .badge-dot{position:absolute;top:2px;right:2px;width:8px;height:8px;border-radius:999px;background:#f43f5e}
+    .hidden{display:none !important}
+
+    /* Layout */
+    .container{padding:16px;max-width:1200px;margin:0 auto;display:grid;gap:16px}
+    .card{background:rgba(15,23,42,.72);backdrop-filter: blur(8px);border:1px solid rgba(226,232,240,.12);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+    .card-header{padding:16px;border-bottom:1px solid rgba(226,232,240,.12)}
+    .pane{padding:16px}
+    h2,h3{margin:0 0 8px}
+    .muted{color:rgba(255,255,255,.75)}
+    .small{font-size:12px}
+    .row{display:flex;align-items:center;gap:10px}
+    .between{justify-content:space-between}
+    .gap{gap:10px}
+    .grid-4{display:grid;gap:10px;grid-template-columns:1fr}
+    @media(min-width:900px){.grid-4{grid-template-columns:repeat(4,1fr)}}
+    .table-scroll{overflow:auto}
+    table{width:100%;border-collapse:separate;border-spacing:0}
+    th,td{padding:10px 12px;border-bottom:1px solid rgba(226,232,240,.12);white-space:nowrap}
+    thead th{position:sticky;top:0;background:rgba(15,23,42,.92);backdrop-filter: blur(8px);}
+
+    /* Inputs & buttons */
+    .btn{display:inline-flex;align-items:center;gap:8px;justify-content:center;border:0;border-radius:12px;padding:12px 16px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--blue-800),var(--blue-600),var(--blue-400));transition:filter .2s ease, transform .05s ease}
+    .btn.small{padding:8px 12px;font-size:14px}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .btn.outline{background:transparent;border:1px solid rgba(255,255,255,.24)}
+    .btn.ghost{background:transparent}
+    .pulse{animation:pulse 3s ease-in-out infinite}
+    @keyframes pulse{0%,100%{filter:saturate(1)}50%{filter:saturate(1.2) brightness(1.05)}}
+    input,select,textarea{width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(226,232,240,.18);background:rgba(255,255,255,.06);color:#fff}
+
+    /* Lists */
+    .list{display:grid}
+    .list .rowi{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:12px;border-bottom:1px solid rgba(226,232,240,.12)}
+    .list .rowi.read{opacity:.6}
+
+    /* Chips */
+    .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid rgba(226,232,240,.18)}
+    .chip.green{background:rgba(22,163,74,.15);border-color:rgba(22,163,74,.35)}
+    .chip.yellow{background:rgba(234,179,8,.15);border-color:rgba(234,179,8,.35)}
+    .chip.red{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.35)}
+
+    /* FAB */
+    .fab{position:fixed;right:18px;bottom:18px;z-index:12;border:0;border-radius:16px;padding:14px 16px;background:linear-gradient(135deg,var(--blue-800),var(--blue-600));color:#fff;box-shadow:var(--shadow);cursor:pointer}
+
+    /* Modals */
+    .modal{width:min(720px,94vw);border:1px solid rgba(226,232,240,.18);border-radius:16px;background:#0f172a;color:#fff}
+    .modal::backdrop{background:rgba(0,0,0,.35);backdrop-filter: blur(2px)}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid rgba(226,232,240,.12)}
+    .modal-body{padding:14px}
+    .modal-footer{display:flex;align-items:center;gap:10px;justify-content:flex-end;padding:12px 14px;border-top:1px solid rgba(226,232,240,.12)}
+    .avatar-row{display:flex;align-items:center;gap:12px}
+    .avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;border:1px solid rgba(226,232,240,.18)}
+    .divider{border:0;border-top:1px solid rgba(226,232,240,.12);margin:12px 0}
+
+    /* Overlays & toasts */
+    .overlay{position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.35);backdrop-filter: blur(2px)}
+    .overlay.hidden{display:none}
+    .loader{display:grid;place-items:center;gap:10px;background:rgba(15,23,42,.9);border:1px solid rgba(226,232,240,.15);padding:16px 18px;border-radius:12px}
+    .spin{animation:spin 1.2s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#121b2e;color:#fff;border:1px solid rgba(226,232,240,.18);padding:12px 16px;border-radius:12px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s, transform .2s}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    .sw-update{position:fixed;right:18px;bottom:18px;background:#121b2e;border:1px solid rgba(226,232,240,.18);padding:8px 10px;border-radius:10px;display:flex;align-items:center;gap:10px}
+    .sw-update.hidden{display:none}
+  </style>
+
+  <script>
+    window.APP_VERSION = '1.0.0';
+  </script>
+  <script defer src="app.js"></script>
+</head>
+<body data-page="admin">
+  <div class="bg-animated" aria-hidden="true">
+    <canvas id="bg-light"></canvas>
+    <div class="bg-gradient"></div>
+  </div>
+
+  <header class="appbar">
+    <div class="appbar-left"><h1 class="brand">Admin</h1></div>
+    <div class="appbar-center"><div class="server-time" id="serverTime">—:—:—</div></div>
+    <div class="appbar-right">
+      <button id="notifBtn" class="icon-btn badge" aria-label="Notifikasi">
+        <span class="material-symbols-rounded">notifications</span>
+        <span id="notifBadge" class="badge-dot hidden"></span>
+      </button>
+      <button id="profileBtn" class="icon-btn" aria-label="Profil">
+        <span class="material-symbols-rounded">admin_panel_settings</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Panel Cuti -->
+    <section class="card">
+      <header class="card-header">
+        <h2>Permintaan cuti</h2>
+      </header>
+      <div id="adminLeaveList" class="list"></div>
+    </section>
+
+    <!-- Riwayat Presensi -->
+    <section class="card">
+      <header class="card-header">
+        <div class="row between">
+          <h2>Riwayat presensi</h2>
+          <div class="row gap">
+            <button id="exportCsvBtn" class="btn outline">
+              <span class="material-symbols-rounded">table_view</span>
+              Ekspor CSV
+            </button>
+          </div>
+        </div>
+        <div class="filters grid-4">
+          <div class="field">
+            <label for="filterName">Nama</label>
+            <input id="filterName" type="text" placeholder="Cari nama" />
+          </div>
+          <div class="field">
+            <label for="dateFrom">Dari</label>
+            <input id="dateFrom" type="date" />
+          </div>
+          <div class="field">
+            <label for="dateTo">Sampai</label>
+            <input id="dateTo" type="date" />
+          </div>
+          <div class="field">
+            <label for="presetRange">Preset</label>
+            <select id="presetRange">
+              <option value="H">Hari ini</option>
+              <option value="M">Minggu ini</option>
+              <option value="B">Bulan ini</option>
+              <option value="T">Tahun ini</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <button id="applyFilterBtn" class="btn">Terapkan</button>
+        </div>
+      </header>
+
+      <div class="table-scroll">
+        <table class="table" id="attendanceTable" aria-label="Tabel presensi">
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Waktu</th>
+              <th>Nama</th>
+              <th>Jenis</th>
+              <th>Koordinat</th>
+              <th>Status</th>
+              <th>Foto</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="attendanceTbody"></tbody>
+        </table>
+      </div>
+      <div id="summaryRow" class="muted small pane">Ringkasan: —</div>
+    </section>
+  </main>
+
+  <!-- FAB: Pengumuman -->
+  <button id="fabAnnouncement" class="fab" aria-label="Buat pengumuman">
+    <span class="material-symbols-rounded">campaign</span>
+  </button>
+
+  <!-- Modal Profil Admin + Create User -->
+  <dialog id="profileDialog" class="modal">
+    <form method="dialog" id="adminProfileForm">
+      <header class="modal-header">
+        <h3>Profil admin</h3>
+        <button class="icon-btn" value="cancel" aria-label="Tutup">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </header>
+      <div class="modal-body">
+        <div class="avatar-row">
+          <img id="profilePhoto" class="avatar" alt="Foto profil" />
+          <label class="btn ghost">
+            <span class="material-symbols-rounded">add_a_photo</span>
+            Ganti foto
+            <input id="profilePhotoInput" type="file" accept="image/*" hidden />
+          </label>
+        </div>
+        <div class="field">
+          <label for="displayName">Nama</label>
+          <input id="displayName" type="text" maxlength="80" />
+        </div>
+        <div class="field">
+          <label for="address">Alamat</label>
+          <input id="address" type="text" maxlength="160" />
+        </div>
+
+        <hr class="divider" />
+
+        <h4>Buat akun karyawan</h4>
+        <div class="grid-4" style="grid-template-columns:1fr 1fr;">
+          <div class="field">
+            <label for="newUserEmail">Email</label>
+            <input id="newUserEmail" type="email" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="newUserPass">Sandi</label>
+            <input id="newUserPass" type="password" autocomplete="off" />
+          </div>
+        </div>
+        <div class="row">
+          <button id="createUserBtn" type="button" class="btn outline">
+            <span class="material-symbols-rounded">person_add</span>
+            Buat
+          </button>
+        </div>
+
+        <div class="grid-4" style="grid-template-columns:1fr 1fr; margin-top:8px">
+          <div class="field">
+            <label for="assignUid">UID</label>
+            <input id="assignUid" type="text" placeholder="Tempel UID" />
+          </div>
+          <div class="field">
+            <label for="assignLabel">Nama</label>
+            <input id="assignLabel" type="text" placeholder="Nama tampilan" />
+          </div>
+        </div>
+        <div class="row">
+          <button id="assignRoleBtn" type="button" class="btn outline">
+            <span class="material-symbols-rounded">how_to_reg</span>
+            Tetapkan/label
+          </button>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn ghost" id="logoutBtn" type="button">
+          <span class="material-symbols-rounded">logout</span>
+          Keluar
+        </button>
+        <div class="spacer"></div>
+        <button class="btn" value="cancel">Batal</button>
+        <button class="btn primary" id="saveProfileBtn" value="default">Simpan</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- Modal Pengumuman -->
+  <dialog id="announceDialog" class="modal">
+    <form method="dialog" id="announceForm">
+      <header class="modal-header">
+        <h3>Pengumuman</h3>
+        <button class="icon-btn" value="cancel" aria-label="Tutup">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </header>
+      <div class="modal-body">
+        <div class="field">
+          <label for="announceMessage">Isi pengumuman</label>
+          <textarea id="announceMessage" rows="4" maxlength="500" required></textarea>
+        </div>
+        <div class="grid-4" style="grid-template-columns:1fr 1fr;">
+          <div class="field">
+            <label for="effectiveDate">Tanggal berlaku (opsional)</label>
+            <input id="effectiveDate" type="date" />
+          </div>
+          <div class="field">
+            <label for="requiredByDate">Wajib presensi per tanggal (opsional)</label>
+            <input id="requiredByDate" type="date" />
+          </div>
+        </div>
+        <p class="small muted">Jika diisi, tanggal akan menandai wajib/tidak pada hari terkait.</p>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn" value="cancel">Batal</button>
+        <button class="btn primary" id="sendAnnouncementBtn" value="default">Kirim/Simpan</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- Modal Koreksi Presensi -->
+  <dialog id="editAttendanceDialog" class="modal">
+    <form method="dialog" id="editAttendanceForm">
+      <header class="modal-header">
+        <h3>Koreksi presensi</h3>
+        <button class="icon-btn" value="cancel" aria-label="Tutup">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </header>
+      <div class="modal-body">
+        <input type="hidden" id="editDocId" />
+        <div class="grid-4" style="grid-template-columns:1fr 1fr;">
+          <div class="field">
+            <label for="editType">Jenis</label>
+            <select id="editType">
+              <option value="in">Berangkat</option>
+              <option value="out">Pulang</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="editStatus">Status</label>
+            <select id="editStatus">
+              <option value="green">Tepat</option>
+              <option value="yellow">Terlambat</option>
+              <option value="red">Alpa</option>
+            </select>
+          </div>
+        [43dcd9a7-70db-4a1f-b0ae-981daa162054](https://github.com/FitFingers/nextjs-single-page-starter/tree/bf751abfe1e9b10cebec3b808e6291985f0e9edc/pages%2F_document.js?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "1")</
+        <div class="field">
+            <label for="editReason">Alasan koreksi (wajib)</label>
+            <textarea id="editReason" rows="3" maxlength="240" required></textarea>
+          </div>
+        </div>
+        <div class="grid-4" style="grid-template-columns:1fr 1fr;">
+          <div class="field">
+            <label for="editDate">Tanggal</label>
+            <input id="editDate" type="date" required />
+          </div>
+          <div class="field">
+            <label for="editTime">Waktu</label>
+            <input id="editTime" type="time" required />
+          </div>
+        </div>
+        <div class="grid-4" style="grid-template-columns:1fr 1fr;">
+          <div class="field">
+            <label for="editLat">Lat</label>
+            <input id="editLat" type="number" step="0.000001" />
+          </div>
+          <div class="field">
+            <label for="editLng">Lng</label>
+            <input id="editLng" type="number" step="0.000001" />
+          </div>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn" value="cancel">Batal</button>
+        <button class="btn primary" id="saveEditAttendanceBtn" value="default">Simpan</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- Overlay global -->
+  <div id="overlay" class="overlay hidden" role="alert" aria-live="assertive">
+    <div class="loader">
+      <span class="material-symbols-rounded spin" aria-hidden="true">progress_activity</span>
+      <p>Memproses…</p>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- SW update banner -->
+  <div id="sw-update" class="sw-update hidden" role="status" aria-live="polite">
+    <span>Tersedia versi baru.</span>
+    <button id="reloadBtn" class="btn small">Muat versi baru</button>
+  </div>
+</body>
+</html>

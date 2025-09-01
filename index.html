@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="id" class="no-js">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Masuk • Presensi FUPA</title>
+  <meta name="theme-color" content="#2563EB" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:wght@400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      --blue-600:#2563EB; --blue-400:#60A5FA; --blue-800:#1E40AF; --blue-300:#93C5FD;
+      --text:#0B1220; --card:#0F172A; --divider:#E2E8F0;
+      --ok:#16a34a; --late:#eab308; --abs:#ef4444;
+      --glass: rgba(15,23,42,.72);
+      --shadow: 0 10px 30px rgba(0,0,0,.25);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:#fff; background:#0b1022;
+      overflow-x:hidden; -webkit-tap-highlight-color:transparent;
+    }
+    .bg-animated{position:fixed;inset:0;z-index:-2}
+    .bg-gradient{
+      position:absolute; inset:0; z-index:-2;
+      background:
+        radial-gradient(1200px 800px at 20% 30%, rgba(147,197,253,.16), transparent 60%),
+        radial-gradient(900px 600px at 80% 70%, rgba(96,165,250,.12), transparent 60%),
+        linear-gradient(135deg, var(--blue-800), var(--blue-600), var(--blue-400));
+      filter:saturate(1.1);
+    }
+    #bg-light{position:absolute;inset:0;z-index:-1;opacity:.5}
+    @media (prefers-reduced-motion: reduce){
+      #bg-light{display:none}
+    }
+
+    .centered{
+      min-height:100%;
+      display:grid;
+      place-items:center;
+      padding:24px;
+    }
+    .card{
+      width:100%; max-width:460px;
+      background:var(--glass); backdrop-filter: blur(10px);
+      border:1px solid rgba(226,232,240,.12);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden; animation:fadeSlide .5s ease both;
+    }
+    .card-header{padding:24px 24px 8px}
+    .title{margin:0 0 6px;font-size:28px;font-weight:700}
+    .subtitle{margin:0;color:rgba(255,255,255,.7)}
+    form{padding:16px 24px 24px}
+    .field{margin:14px 0}
+    label{display:block;margin:0 0 8px;color:#fff;font-weight:600}
+    .input{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border:1px solid rgba(226,232,240,.18);border-radius:12px;padding:10px 12px}
+    .input input{flex:1; background:transparent; border:0; outline:0; color:#fff; font-size:16px}
+    .input .material-symbols-rounded{color:var(--blue-300)}
+    .icon-btn{background:transparent;border:0;color:#fff;cursor:pointer;padding:6px;border-radius:10px}
+    .icon-btn:active{transform:scale(.98)}
+    .hint{margin:6px 2px 0;color:rgba(255,255,255,.7);font-size:12px}
+    .captcha{margin-top:10px}
+    .hidden{display:none !important}
+    .row{display:flex;align-items:center;gap:10px}
+    .between{justify-content:space-between}
+    .btn{
+      display:inline-flex;align-items:center;gap:8px;justify-content:center;
+      border:0; border-radius:12px; padding:12px 16px; cursor:pointer; color:#fff;
+      background:linear-gradient(135deg,var(--blue-800),var(--blue-600),var(--blue-400));
+      transition:filter .2s ease, transform .05s ease;
+    }
+    .btn.small{padding:8px 12px;font-size:14px}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .btn:active{transform:translateY(1px)}
+    .btn.outline{background:transparent;border:1px solid rgba(255,255,255,.24)}
+    .btn.ghost{background:transparent}
+    .pulse{animation:pulse 3s ease-in-out infinite}
+    @keyframes pulse{0%,100%{filter:saturate(1)}50%{filter:saturate(1.2) brightness(1.05)}}
+    .link-btn{background:transparent;border:0;color:#93C5FD;cursor:pointer;padding:8px;border-radius:8px}
+    .overlay{position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.35);backdrop-filter: blur(2px)}
+    .overlay.hidden{display:none}
+    .loader{display:grid;place-items:center;gap:10px;background:rgba(15,23,42,.9);border:1px solid rgba(226,232,240,.15);padding:16px 18px;border-radius:12px}
+    .spin{animation:spin 1.2s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes fadeSlide{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:translateY(0)}}
+    .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#121b2e;color:#fff;border:1px solid rgba(226,232,240,.18);padding:12px 16px;border-radius:12px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s, transform .2s}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    .sw-update{position:fixed;right:18px;bottom:18px;background:#121b2e;border:1px solid rgba(226,232,240,.18);padding:8px 10px;border-radius:10px;display:flex;align-items:center;gap:10px}
+    .sw-update.hidden{display:none}
+    .material-symbols-rounded{font-variation-settings:'FILL' 0,'wght' 600,'GRAD' 0,'opsz' 24}
+  </style>
+  <script>
+    window.APP_VERSION = '1.0.0';
+  </script>
+  <script defer src="app.js"></script>
+</head>
+<body data-page="login">
+  <div class="bg-animated" aria-hidden="true">
+    <canvas id="bg-light"></canvas>
+    <div class="bg-gradient"></div>
+  </div>
+
+  <main class="centered">
+    <section class="card login-card" aria-labelledby="loginTitle">
+      <header class="card-header">
+        <h1 id="loginTitle" class="title">Masuk</h1>
+        <p class="subtitle">Silakan autentikasi untuk melanjutkan.</p>
+      </header>
+
+      <form id="loginForm" novalidate autocomplete="on">
+        <div class="field">
+          <label for="email">Email</label>
+          <div class="input with-icon">
+            <span class="material-symbols-rounded" aria-hidden="true">mail</span>
+            <input id="email" name="email" type="email" inputmode="email" autocomplete="username" required />
+          </div>
+          <p class="hint" id="emailHint"></p>
+        </div>
+
+        <div class="field">
+          <label for="password">Kata sandi</label>
+          <div class="input with-icon">
+            <span class="material-symbols-rounded" aria-hidden="true">lock</span>
+            <input id="password" name="password" type="password" autocomplete="current-password" required minlength="6" />
+            <button type="button" id="togglePassword" class="icon-btn" aria-label="Tampilkan sandi">
+              <span class="material-symbols-rounded">visibility</span>
+            </button>
+          </div>
+          <p class="hint" id="passwordHint"></p>
+        </div>
+
+        <div id="captchaWrap" class="captcha hidden" aria-live="polite">
+          <label for="captchaAnswer" id="captchaQuestion">Verifikasi</label>
+          <div class="input with-icon">
+            <span class="material-symbols-rounded" aria-hidden="true">verified_user</span>
+            <input id="captchaAnswer" type="text" inputmode="numeric" autocomplete="off" />
+          </div>
+        </div>
+
+        <button id="btnLogin" type="submit" class="btn primary pulse" disabled>
+          <span class="material-symbols-rounded" aria-hidden="true">login</span>
+          Masuk
+        </button>
+
+        <div class="row between">
+          <button id="forgotBtn" class="link-btn" type="button">Lupa sandi?</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <div id="overlay" class="overlay hidden" role="alert" aria-live="assertive">
+    <div class="loader">
+      <span class="material-symbols-rounded spin" aria-hidden="true">progress_activity</span>
+      <p>Memproses…</p>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <div id="sw-update" class="sw-update hidden" role="status" aria-live="polite">
+    <span>Tersedia versi baru.</span>
+    <button id="reloadBtn" class="btn small">Muat versi baru</button>
+  </div>
+</body>
+</html>
